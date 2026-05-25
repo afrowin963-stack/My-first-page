@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerQuest | Αναφορά Αποτελεσμάτων</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="quiz-page">
+
+<main>
+    <div class="quiz-panel">
+        
+        <div class="quiz-image-side" style="background-image: url('https://images.unsplash.com/photo-1504868584819-f8e8b446d2e4?q=80&w=600');"></div>
+        
+        <div class="quiz-content-side">
+            <div class="quiz-meta">Τελική Αναφορά</div>
+            <div class="category-title">Επαγγελματικό Προφίλ</div>
+            
+            <div id="profile-narrative"></div>
+            
+            <div class="results-grid">
+                
+                <div class="skills-column">
+                    <h3 class="section-title">Δείκτες Ικανοτήτων</h3>
+                    <div id="skills-list"></div>
+                </div>
+                
+                <div class="careers-column">
+                    <h3 class="section-title">Προτεινόμενες Κατευθύνσεις</h3>
+                    <div id="career-list"></div>
+                </div>
+                
+            </div>
+
+            <button class="btn-restart" onclick="restartQuiz()">Νέα Αξιολόγηση</button>
+
+            <div class="quiz-disclaimer">
+                ⚠️ <strong>Σημείωση:</strong> To CareerQuest είναι εκπαιδευτικό εργαλείο πλοήγησης και δεν αντικαθιστά μια επίσημη ψυχομετρική ή συμβουλευτική αξιολόγηση.
+            </div>
+        </div>
+        
+    </div>
+</main>
+
+<script>
+const skillLabels = {
+    analytical: 'Αναλυτική Σκέψη',
+    creative: 'Δημιουργικότητα',
+    social: 'Κοινωνική Νοημοσύνη',
+    practical: 'Πρακτική Εφαρμογή',
+    organized: 'Οργάνωση',
+    leadership: 'Ηγετικές Ικανότητες',
+    technical: 'Τεχνική Κατάρτιση'
+};
+
+const careers = [
+    {
+        title: "Τέχνες & Design",
+        description: "Οπτική επικοινωνία, αρχιτεκτονική και παραγωγή δημιουργικού υλικού.",
+        universities: "Αρχιτεκτονική, Γραφιστική, Καλών Τεχνών",
+        requiredSkills: { creative: 35, practical: 15, social: 10 }
+    },
+    {
+        title: "STEM & Πληροφορική",
+        description: "Επίλυση σύνθετων προβλημάτων με χρήση λογικής και ψηφιακών εργαλείων.",
+        universities: "Πληροφορική, Επιστήμη Δεδομένων, Cybersecurity",
+        requiredSkills: { analytical: 35, technical: 25, organized: 10 }
+    },
+    {
+        title: "Κοινωνικές Επιστήμες",
+        description: "Μελέτη της ανθρώπινης συμπεριφοράς και κοινωνική προσφορά.",
+        universities: "Ψυχολογία, Νομική, Κοινωνιολογία",
+        requiredSkills: { social: 35, creative: 15, analytical: 10 }
+    },
+    {
+        title: "Διοίκηση & Στρατηγική",
+        description: "Οργάνωση επιχειρήσεων, λήψη αποφάσεων και οικονομική ανάλυση.",
+        universities: "Διοίκηση Επιχειρήσεων, Οικονομικά, Marketing",
+        requiredSkills: { leadership: 30, organized: 30, social: 10 }
+    }
+];
+
+function generateNarrative(skills) {
+    const sorted = Object.entries(skills).sort((a, b) => b[1] - a[1]);
+    const top1 = sorted[0]?.[0] || 'creative';
+    const top2 = sorted[1]?.[0] || 'leadership';
+
+    const intro = {
+        analytical: "Το προφίλ σας ορίζεται από μια ισχυρή λογική βάση και έφεση στην επίλυση προβλημάτων.",
+        creative: "Διαθέτετε ένα ξεκάθαρο δημιουργικό όραμα και ικανότητα για πρωτότυπες προσεγγίσεις.",
+        social: "Επιδεικνύετε υψηλή κοινωνική νοημοσύνη και κλίση προς τη συνεργασία.",
+        practical: "Είστε πραγματιστές, με εστίαση σε χειροπιαστά αποτελέσματα και τεχνική εκτέλεση.",
+        leadership: "Διαθέτετε ηγετική δυναμική με έμφαση στον συντονισμό και τη στρατηγική.",
+        technical: "Η ικανότητά σας στα τεχνικά συστήματα είναι ο κεντρικός πυλώνας του προφίλ σας.",
+        organized: "Ο μεθοδικός σχεδιασμός και η προσοχή στη λεπτομέρεια είναι τα δυνατά σας σημεία."
+    };
+
+    return `
+        <p style="font-size: 1.05rem; line-height: 1.6; color: var(--text-dark); margin-bottom: 10px;">
+            ${intro[top1]} Σε συνδυασμό με την επάρκειά σας στον τομέα <strong>${skillLabels[top2]}</strong>, είστε κατάλληλοι για περιβάλλοντα που απαιτούν εξειδικευμένη τεχνογνωσία και στρατηγική ανάπτυξη.
+        </p>
+    `;
+}
+
+function renderResults() {
+    const skills = JSON.parse(localStorage.getItem('careerquest_skills')) || { analytical: 18, creative: 36, social: 24, practical: 18, organized: 15, leadership: 30, technical: 21 };
+    
+    document.getElementById('profile-narrative').innerHTML = generateNarrative(skills);
+
+    let skillsHtml = '';
+    Object.entries(skillLabels).forEach(([key, label]) => {
+        const val = skills[key] || 0;
+        const width = Math.min((val / 45) * 100, 100);
+        skillsHtml += `
+            <div class="skill-row">
+                <span>${label}</span>
+                <span>${val}</span>
+            </div>
+            <div class="bar">
+                <div class="fill" data-width="${width}%"></div>
+            </div>`;
+    });
+    document.getElementById('skills-list').innerHTML = skillsHtml;
+
+    const matches = careers.map(c => {
+        let score = 0, total = 0;
+        for (const s in c.requiredSkills) {
+            score += Math.min(skills[s] || 0, c.requiredSkills[s]);
+            total += c.requiredSkills[s];
+        }
+        let percentage = Math.round((score / total) * 100);
+        return { ...c, percentage: Math.min(percentage, 100) };
+    }).sort((a, b) => b.percentage - a.percentage);
+
+    let careerHtml = '';
+    matches.slice(0, 2).forEach(m => {
+        careerHtml += `
+            <div class="career-card">
+                <div class="career-header">
+                    <h4>${m.title}</h4>
+                    <span class="match-pct">${m.percentage}% Match</span>
+                </div>
+                <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 6px; line-height: 1.4;">${m.description}</p>
+                <div class="career-uni">🎓 ${m.universities}</div>
+            </div>`;
+    });
+    document.getElementById('career-list').innerHTML = careerHtml;
+
+    setTimeout(() => {
+        document.querySelectorAll('.fill').forEach(f => {
+            f.style.width = f.getAttribute('data-width');
+        });
+    }, 150);
+}
+
+function restartQuiz() {
+    localStorage.clear();
+    window.location.href = 'index2.html';
+}
+
+window.onload = renderResults;
+</script>
+</body>
+</html>

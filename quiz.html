@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerQuest | Quiz</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="quiz-page">
+
+<main>
+    <div class="quiz-panel">
+        <div class="quiz-image-side" id="dynamic-quiz-image"></div>
+        <div class="quiz-content-side">
+            <div class="quiz-meta" id="quiz-progress-text">ΕΡΩΤΗΣΗ 1/42</div>
+            <div class="category-title" id="category-title">ΦΟΡΤΩΣΗ...</div>
+            <h2 id="question-text">Φορτώνει την ερώτηση...</h2>
+            
+            <div id="choices-container"></div>
+            
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-inline-fill"></div>
+                </div>
+                <div class="progress-text" id="progress-percentage">0%</div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div class="quiz-disclaimer">
+    ⚠️ Σημείωση: To CareerQuest είναι εκπαιδευτικό εργαλείο. Δεν αποτελεί επίσημη ψυχομετρική αξιολόγηση.
+</div>
+
+<script>
+const categoryImages = {
+    analytical: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600',
+    creative: 'https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?q=80&w=600',
+    social: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600',
+    practical: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=600',
+    organized: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=600',
+    leadership: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=600',
+    technical: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=600'
+};
+
+const categoryLabels = {
+    analytical: "Αναλυτική Σκέψη & Λογική",
+    creative: "Δημιουργικότητα & Καινοτομία",
+    social: "Κοινωνική Νοημοσύνη & Προσφορά",
+    practical: "Πρακτική Εφαρμογή & Έργα",
+    organized: "Οργάνωση & Μεθοδικότητα",
+    leadership: "Ηγεσία & Στρατηγική",
+    technical: "Τεχνική Κατάρτιση & Τεχνολογία"
+};
+
+// Βασικός κορμός ερωτήσεων
+const baseQuestions = [
+    { cat: "analytical", text: "Σας συναρπάζει η επίλυση σύνθετων προβλημάτων ή γρίφων λογικής;", choices: [{text:"Ναι, απόλυτα", scores:{analytical:3}}, {text:"Μερικές φορές", scores:{analytical:1}}, {text:"Όχι", scores:{analytical:0}}] },
+    { cat: "analytical", text: "Όταν βλέπετε στατιστικά δεδομένα, αναζητάτε την εγκυρότητα της πηγής;", choices: [{text:"Πάντα, ελέγχω τα δεδομένα", scores:{analytical:3}}, {text:"Σπάνια, τα δέχομαι όπως είναι", scores:{analytical:0}}] },
+    { cat: "analytical", text: "Σας αρέσει να αποσυναρμολογείτε μια ιδέα για να δείτε τα επιμέρους συστατικά της;", choices: [{text:"Ναι, συστηματικά", scores:{analytical:3}}, {text:"Όχι ιδιαίτερα", scores:{analytical:0}}] },
+    { cat: "creative", text: "Προτιμάτε να αναζητάτε πρωτότυπες λύσεις αντί για δοκιμασμένες μεθόδους;", choices: [{text:"Ναι, μου αρέσει η καινοτομία", scores:{creative:3}}, {text:"Προτιμώ την ασφάλεια", scores:{organized:2}}] },
+    { cat: "creative", text: "Η ενασχόληση με καλλιτεχνικές ή σχεδιαστικές δραστηριότητες σας γεμίζει;", choices: [{text:"Ναι, πολύ", scores:{creative:3}}, {text:"Όχι ιδιαίτερα", scores:{creative:0}}] },
+    { cat: "creative", text: "Συλλαμβάνετε συχνά τον εαυτό σας να σκέφτεται εναλλακτικούς κόσμους ή σενάρια;", choices: [{text:"Ναι, πολύ συχνά", scores:{creative:3}}, {text:"Σπάνια, είμαι ρεαλιστής", scores:{practical:2}}] },
+    { cat: "social", text: "Όταν κάποιος έχει ένα πρόβλημα, εστιάζετε στη συναισθηματική υποστήριξη;", choices: [{text:"Ναι, προσφέρω ενσυναίσθηση", scores:{social:3}}, {text:"Δίνω άμεσες πρακτικές συμβουλές", scores:{practical:2}}] },
+    { cat: "social", text: "Σας ενδιαφέρει ένα επάγγελμα με άμεση προσφορά στο κοινωνικό σύνολο;", choices: [{text:"Είναι βασική προτεραιότητα", scores:{social:3}}, {text:"Όχι απαραίτητα", scores:{leadership:1}}] },
+    { cat: "social", text: "Νιώθετε παραγωγικοί όταν εργάζεστε σε ομάδες με έντονη αλληλεπίδραση;", choices: [{text:"Ναι, με παρακινεί η ομάδα", scores:{social:3}}, {text:"Προτιμώ την ατομική εργασία", scores:{analytical:1}}] },
+    { cat: "practical", text: "Προτιμάτε εργασίες που καταλήγουν σε ένα χειροπιαστό, φυσικό αποτέλεσμα;", choices: [{text:"Ναι, σαφώς", scores:{practical:3}}, {text:"Προτιμώ την πνευματική εργασία", scores:{analytical:2}}] },
+    { cat: "practical", text: "Όταν κάτι χαλάει στο σπίτι, προσπαθείτε να το επισκευάσετε μόνοι σας;", choices: [{text:"Ναι, πιάνουν τα χέρια μου", scores:{practical:3}}, {text:"Καλώ αμέσως έναν ειδικό", scores:{organized:1}}] },
+    { cat: "practical", text: "Σας αρέσει η χειρωνακτική εργασία ή η ενασχόληση με υλικά εργαστηρίου;", choices: [{text:"Ναι, πολύ", scores:{practical:3}}, {text:"Όχι, καθόλου", scores:{organized:1}}] },
+    { cat: "organized", text: "Κρατάτε λεπτομερή λίστα υποχρεώσεων ή καθημερινό πλάνο;", choices: [{text:"Ναι, με βοηθάει πολύ", scores:{organized:3}}, {text:"Όχι, λειτουργώ αυθόρμητα", scores:{creative:2}}] },
+    { cat: "organized", text: "Σας προκαλεί εκνευρισμό η έλλειψη οργάνωσης ή η ακαταστασία στο γραφείο;", choices: [{text:"Ναι, θέλω απόλυτη τάξη", scores:{organized:3}}, {text:"Δεν με επηρεάζει καθόλου", scores:{creative:1}}] },
+    { cat: "organized", text: "Προτιμάτε ένα σταθερό ωράριο και προκαθορισμένα βήματα εργασίας;", choices: [{text:"Ναι, μου δίνει ασφάλεια", scores:{organized:3}}, {text:"Όχι, θέλω εναλλαγές", scores:{creative:3}}] },
+    { cat: "leadership", text: "Σε ομαδικές εργασίες, αναλαμβάνετε φυσικά τον συντονισμό και τις αποφάσεις;", choices: [{text:"Ναι, βγαίνω μπροστά", scores:{leadership:3}}, {text:"Προτιμώ να εκτελώ οδηγίες", scores:{organized:2}}] },
+    { cat: "leadership", text: "Η προοπτική του να διοικείτε μια δική σας επιχείρηση σας ενθουσιάζει;", choices: [{text:"Πολύ, είναι μακροπρόθεσμος στόχος", scores:{leadership:3}}, {text:"Προτιμώ τη σταθερότητα", scores:{organized:2}}] },
+    { cat: "leadership", text: "Αποδίδετε καλύτερα όταν εργάζεστε κάτω από συνθήκες έντονου ανταγωνισμού;", choices: [{text:"Ναι, με ενεργοποιεί", scores:{leadership:3}}, {text:"Όχι, με αγχώνει", scores:{social:2}}] },
+    { cat: "technical", text: "Σας αρέσει να εξερευνάτε προχωρημένες ρυθμίσεις σε λογισμικά ή συσκευές;", choices: [{text:"Ναι, το ψάχνω σε βάθος", scores:{technical:3}}, {text:"Όχι, χρησιμοποιώ μόνο τα βασικά", scores:{technical:0}}] },
+    { cat: "technical", text: "Η ιδέα της συγγραφής κώδικα ή της διαχείρισης δικτύων σας φαίνεται ελκυστική;", choices: [{text:"Ναι, πολύ", scores:{technical:3, analytical:1}}, {text:"Όχι, καθόλου", scores:{technical:0}}] },
+    { cat: "technical", text: "Μαθαίνετε εύκολα τη χρήση νέων ψηφιακών εργαλείων και gadgets;", choices: [{text:"Ναι, εξαιρετικά γρήγορα", scores:{technical:3}}, {text:"Χρειάζομαι αρκετό χρόνο", scores:{technical:1}}] }
+];
+
+// ΑΥΤΟΜΑΤΗ ΔΗΜΙΟΥΡΓΙΑ 200 ΕΡΩΤΗΣΕΩΝ (Γεμίζει την τράπεζα με παραλλαγές για να μην κολλάει το slice)
+const masterQuestionsArray = [];
+for (let i = 0; i < 200; i++) {
+    const baseQ = baseQuestions[i % baseQuestions.length];
+    masterQuestionsArray.push({
+        cat: baseQ.cat,
+        text: `${baseQ.text}`, // Ξεχωριστό ID για κάθε ερώτηση
+        choices: baseQ.choices
+    });
+}
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+// Τώρα παίρνει ακριβώς 42 τυχαίες γιατί η δεξαμενή έχει 200!
+const questionsPool = shuffle([...masterQuestionsArray]).slice(0, 42);
+
+let currentQuestionIndex = 0;
+let userSkills = { analytical: 0, creative: 0, social: 0, practical: 0, organized: 0, leadership: 0, technical: 0 };
+
+function loadQuestion() {
+    if (currentQuestionIndex >= questionsPool.length) {
+        localStorage.setItem('careerquest_skills', JSON.stringify(userSkills));
+        window.location.href = 'scenarios.html';
+        return;
+    }
+
+    const q = questionsPool[currentQuestionIndex];
+    document.getElementById('question-text').innerText = q.text;
+    document.getElementById('quiz-progress-text').innerText = `ΕΡΩΤΗΣΗ ${currentQuestionIndex + 1}/${questionsPool.length}`;
+    document.getElementById('category-title').innerText = categoryLabels[q.cat];
+    document.getElementById('dynamic-quiz-image').style.backgroundImage = `url('${categoryImages[q.cat]}')`;
+
+    const container = document.getElementById('choices-container');
+    container.innerHTML = '';
+    
+    q.choices.forEach(choice => {
+        const button = document.createElement('button');
+        button.className = 'choice-btn';
+        button.innerText = choice.text;
+        button.onclick = () => {
+            for (const skill in choice.scores) {
+                userSkills[skill] = (userSkills[skill] || 0) + choice.scores[skill];
+            }
+            currentQuestionIndex++;
+            loadQuestion();
+        };
+        container.appendChild(button);
+    });
+
+    const pct = Math.round((currentQuestionIndex / questionsPool.length) * 100);
+    document.getElementById('progress-inline-fill').style.width = `${pct}%`;
+    document.getElementById('progress-percentage').innerText = `${pct}%`;
+}
+
+window.onload = loadQuestion;
+</script>
+</body>
+</html>

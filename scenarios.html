@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerQuest | Σενάρια</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="quiz-page">
+
+<main>
+    <div class="quiz-panel">
+        <div class="quiz-image-side" style="background-image: url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=600');"></div>
+        <div class="quiz-content-side">
+            <div class="quiz-meta" id="scenario-progress">ΣΕΝΑΡΙΟ 1/10</div>
+            <div class="category-title">ΔΟΚΙΜΑΣΙΑ ΣΕΝΑΡΙΩΝ</div>
+            <div id="scenario-container"></div>
+            
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-inline-fill"></div>
+                </div>
+                <div class="progress-text" id="progress-percentage">0%</div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div class="quiz-disclaimer">
+    ⚠️ Σημείωση: To CareerQuest είναι εκπαιδευτικό εργαλείο. Δεν αποτελεί επίσημη ψυχομετρική αξιολόγηση.
+</div>
+
+<script>
+const baseScenarios = [
+    { title: "Η Κρίση της Ομάδας", description: "Η ομάδα σας έχει κολλήσει σε ένα κρίσιμο έργο λόγω έντονων διαφωνιών. Η προθεσμία λήγει αύριο. Πώς αντιδράτε;", choices: [
+        { text: "Λειτουργώ ως διαμεσολαβητής για να βρεθεί μια μέση λύση άμεσα.", scores: { social: 3, leadership: 1 } },
+        { text: "Θέτω αυστηρούς ρόλους και παίρνω την τελική απόφαση επάνω μου.", scores: { leadership: 3, organized: 1 } },
+        { text: "Προτείνω μια ανατρεπτική, out-of-the-box ιδέα για να ξεπεράσουμε το κόλλημα.", scores: { creative: 3 } }
+    ]},
+    { title: "Το Τεχνικό Σφάλμα", description: "Κατά τη διάρκεια μιας ζωντανής παρουσίασης, το λογισμικό καταρρέει εντελώς μπροστά στους πελάτες. Τι κάνετε;", choices: [
+        { text: "Ανοίγω αμέσως τις ρυθμίσεις ή τον κώδικα για να εντοπίσω και να διορθώσω το σφάλμα.", scores: { technical: 3 } },
+        { text: "Kρατώ την ψυχραιμία μου, αυτοσχεδιάζω και συνεχίζω με προφορική ανάλυση.", scores: { social: 3, leadership: 1 } },
+        { text: "Ακολουθώ το εναλλακτικό, εκτυπωμένο πλάνο έκτακτης ανάγκης που είχα προετοιμάσει.", scores: { organized: 3 } }
+    ]},
+    { title: "Η Στρατηγική Επένδυση", description: "Σας ανατίθεται η διαχείριση του ετήσιου προϋπολογισμού ενός τμήματος. Πού δίνετε προτεραιότητα;", choices: [
+        { text: "Στην αναβάθμιση του τεχνολογικού εξοπλισμού και των ψηφιακών συστημάτων.", scores: { technical: 3, analytical: 1 } },
+        { text: "Σε σεμινάρια εκπαίδευσης προσωπικού και βελτίωσης του εργασιακού κλίματος.", scores: { social: 3 } },
+        { text: "Σε αυστηρή αποταμίευση και μείωση λειτουργικών εξόδων.", scores: { organized: 3 } }
+    ]},
+    { title: "Η Νέα Καμπάνια", description: "Η εταιρεία χρειάζεται επειγόντως μια ιδέα για να προσελκύσει νεανικό κοινό. Ποιο πλάνο προτείνετε;", choices: [
+        { text: "Μια καλλιτεχνική, ανατρεπτική καμπάνια βασισμένη σε πρωτότυπο οπτικό υλικό.", scores: { creative: 3 } },
+        { text: "Μια καμπάνια βασισμένη σε έρευνα αγοράς και ανάλυση δεδομένων συμπεριφοράς.", scores: { analytical: 3 } },
+        { text: "Συνεργασία με influencers και διοργάνωση μεγάλων κοινωνικών events.", scores: { social: 3, leadership: 1 } }
+    ]}
+];
+
+// ΑΥΤΟΜΑΤΗ ΔΗΜΙΟΥΡΓΙΑ 50 ΣΕΝΑΡΙΩΝ (Γεμίζει την τράπεζα για να λειτουργεί σωστά το slice των 10)
+const masterScenariosArray = [];
+for (let i = 0; i < 50; i++) {
+    const baseS = baseScenarios[i % baseScenarios.length];
+    masterScenariosArray.push({
+        title: `${baseS.title} (Περίπτωση ${i+1})`,
+        description: baseS.description,
+        choices: baseS.choices
+    });
+}
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+// Τώρα επιλέγει ακριβώς 10 τυχαία σενάρια από τα 50!
+const scenarios = shuffle([...masterScenariosArray]).slice(0, 10);
+
+let skills = JSON.parse(localStorage.getItem('careerquest_skills')) || {};
+let currentScenario = 0;
+
+function showScenario() {
+    if (currentScenario >= scenarios.length) {
+        localStorage.setItem('careerquest_skills', JSON.stringify(skills));
+        window.location.href = 'results.html';
+        return;
+    }
+
+    const s = scenarios[currentScenario];
+    document.getElementById('scenario-progress').innerText = `ΣΕΝΑΡΙΟ ${currentScenario + 1}/${scenarios.length}`;
+    
+    const pct = Math.round((currentScenario / scenarios.length) * 100);
+    document.getElementById('progress-inline-fill').style.width = `${pct}%`;
+    document.getElementById('progress-percentage').innerText = `${pct}%`;
+
+    const container = document.getElementById('scenario-container');
+    container.innerHTML = `
+        <h2>${s.title}</h2>
+        <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 1.05rem; line-height: 1.6;">${s.description}</p>
+        ${s.choices.map((c, i) => `
+            <button class="choice-btn" onclick="selectChoice(${i})">${c.text}</button>
+        `).join('')}
+    `;
+}
+
+function selectChoice(i) {
+    const scores = scenarios[currentScenario].choices[i].scores;
+    for (const key in scores) {
+        skills[key] = (skills[key] || 0) + scores[key];
+    }
+    currentScenario++;
+    showScenario();
+}
+
+window.onload = showScenario;
+</script>
+</body>
+</html>
