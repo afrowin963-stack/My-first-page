@@ -1,0 +1,314 @@
+:root {
+    --text-dark: #1e293b;
+    --text-muted: #64748b;
+    --primary: #3b82f6;
+    --border: #e2e8f0;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ==========================================================================
+   ΕΠΑΝΑΦΟΡΑ: Το δικό σου αρχικό Φόντο & Διαστάσεις (Όπως στο Mockup)
+   ========================================================================== */
+body.quiz-page {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    margin: 0;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    -webkit-font-smoothing: antialiased;
+    
+    /* Το δικό σου αρχικό background */
+    background: radial-gradient(circle at center, #64748b 0%, #334155 100%);
+    background-size: cover;
+}
+
+main {
+    width: 100%;
+    max-width: 1000px;
+    padding: 20px;
+    z-index: 10;
+}
+
+/* Το Διπλό Πλαίσιο (Panel) */
+.quiz-panel {
+    background: #ffffff;
+    border-radius: 24px;
+    width: 100%;
+    display: flex; /* Σπάει σε 2 στήλες */
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+}
+
+/* Αριστερό Μέρος: Η φωτογραφία που αλλάζει */
+.quiz-image-side {
+    width: 45%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 500px;
+    transition: background-image 0.4s ease-in-out;
+}
+
+/* Δεξί Μέρος: Ερωτήσεις & Απαντήσεις */
+.quiz-content-side {
+    width: 55%;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.quiz-meta {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.category-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-dark);
+    margin-bottom: 25px;
+    letter-spacing: 0.05em;
+}
+
+.quiz-content-side h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 30px;
+    color: var(--text-dark);
+}
+
+/* Container για τις απαντήσεις */
+.choices-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+/* ==========================================================================
+   ΝΕΟ: Μοντέρνα 3D Κουμπιά Απαντήσεων (Όπως στη φωτογραφία)
+   ========================================================================== */
+.choice-btn {
+    width: 100%;
+    padding: 18px 24px;
+    border-radius: 16px;
+    border: none;
+    
+    /* 3D Gradient & Χρώμα από τη φωτογραφία */
+    background: linear-gradient(180deg, #4da4d0 0%, #297ca6 100%);
+    color: #ffffff;
+    font-size: 1.05rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    
+    /* Διάταξη για το Checkmark δεξιά */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    /* Σκιά για βάθος */
+    box-shadow: 0 6px 16px rgba(41, 124, 166, 0.25), 
+                inset 0 1px 1px rgba(255, 255, 255, 0.3);
+    
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.choice-btn:hover {
+    background: linear-gradient(180deg, #5cb3de 0%, #2f8bb9 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(41, 124, 166, 0.35), 
+                inset 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+/* Το λευκό στρογγυλό Checkmark στα δεξιά */
+.choice-btn::after {
+    content: '✓';
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.15);
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.choice-btn:hover::after {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* ==========================================================================
+   ΝΕΟ: Μπάρα Προόδου (Ανάμεσα στις απαντήσεις όπως στη φωτό)
+   ========================================================================== */
+.progress-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    margin: 10px 0;
+    width: 100%;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #1e293b; /* Σκούρο slide-track */
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4da4d0, #5cb3de);
+    width: 0%; /* Αλλάζει δυναμικά από JS */
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+/* Υποσημείωση στο κάτω μέρος */
+.quiz-disclaimer {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6); /* Άσπρα γράμματα με opacity για να φαίνονται στο σκούρο bg */
+    z-index: 100;
+}
+
+/* ==========================================================================
+   ΕΠΑΝΑΦΟΡΑ: Οι δικοί σου Responsive Κανόνες (:has) για τα Αποτελέσματα
+   ========================================================================== */
+@media (max-width: 768px) {
+    .quiz-panel:has(.skill-row) {
+        flex-direction: column; 
+    }
+
+    .quiz-panel:has(.skill-row) .quiz-image-side {
+        display: none;
+    }
+
+    .quiz-panel:has(.skill-row) .quiz-content-side {
+        width: 100%;
+        padding: 40px; 
+    }
+}
+
+/* ==========================================================================
+   ΕΠΑΝΑΦΟΡΑ: Η δική σου μορφοποίηση για τα Αποτελέσματα (Results)
+   ========================================================================== */
+.skill-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 5px;
+    margin-top: 15px;
+}
+
+.bar {
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 20px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.bar .fill {
+    height: 100%;
+    background: linear-gradient(90deg, #0284c7, #38bdf8);
+    width: 0%; 
+    border-radius: 20px;
+    transition: width 1.5s cubic-bezier(0.1, 0.8, 0.2, 1);
+}
+
+.career-item {
+    border-top: 1px solid var(--border);
+    padding: 20px 0;
+    margin-top: 10px;
+}
+
+.career-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.career-header h4 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.match-pct {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #0284c7;
+    background: #eff6
+}
+/* ==========================================================================
+   ΔΙΟΡΘΩΜΕΝΟ: Κουμπί Επανεκκίνησης (Ίδιο στυλ με τα Choice Buttons)
+   ========================================================================== */
+.quiz-content-side button {
+    width: 100%;
+    padding: 18px 24px;
+    margin-top: 35px; /* Περισσότερος αέρας από το πάνω περιεχόμενο */
+    border-radius: 16px;
+    border: none;
+    
+    /* Το ίδιο 3D Gradient & Χρώμα με το Quiz */
+    background: linear-gradient(180deg, #4da4d0 0%, #297ca6 100%);
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center; /* Κεντραρισμένο κείμενο */
+    cursor: pointer;
+    
+    /* Οι ίδιες σκιές για ομοιομορφία */
+    box-shadow: 0 6px 16px rgba(41, 124, 166, 0.25), 
+                inset 0 1px 1px rgba(255, 255, 255, 0.3);
+    
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.quiz-content-side button:hover {
+    background: linear-gradient(180deg, #5cb3de 0%, #2f8bb9 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(41, 124, 166, 0.35), 
+                inset 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+.quiz-content-side button:active {
+    transform: translateY(1px);
+    box-shadow: 0 4px 10px rgba(41, 124, 166, 0.25);
+}
